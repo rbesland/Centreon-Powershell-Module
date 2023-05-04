@@ -1,5 +1,5 @@
-function New-CentreonConnection{
-      <#
+function New-CentreonConnection {
+  <#
         .SYNOPSIS
             Authenticate against the Rest API.
         .PARAMETER Server
@@ -17,41 +17,42 @@ function New-CentreonConnection{
             https://github.com/ClissonFlorian/Centreon-Powershell-Module
     #>
 
-    [CmdletBinding()]
-    param(       
-        [parameter(Mandatory = $true)]
-        [string]$server,
-        [parameter(Mandatory = $false)]
-        $Credentials=(Get-Credential -Message "Enter centreon credentials")
-    )
+  [CmdletBinding()]
+  param(       
+    [parameter(Mandatory = $true)]
+    [string]$server,
+    [parameter(Mandatory = $false)]
+    $Credentials = (Get-Credential -Message "Enter centreon credentials")
+  )
 
-    $url = "$server/centreon/api/index.php?"
+  $url = "$server/centreon/api/index.php?"
 
-    $params = @{
-        "username" = "$($Credentials.UserName)";
-        "password" = "$($Credentials.GetNetworkCredential().Password)";
-    }
+  $params = @{
+    "username" = "$($Credentials.UserName)";
+    "password" = "$($Credentials.GetNetworkCredential().Password)";
+  }
 
 
-    try{
+  try {
 
-        $auth = (Invoke-WebRequest  -Uri "$($url)action=authenticate"  -Method Post -Body $params)
+    $auth = (Invoke-WebRequest  -Uri "$($url)action=authenticate"  -Method Post -Body $params -SkipCertificateCheck)
     
-    }catch {
+  }
+  catch {
      
-        throw "$($error[0].ErrorDetails.Message)"
-    }
+    throw "$($error[0].ErrorDetails.Message)"
+  }
     
-    $authToken = ($auth | ConvertFrom-Json).authToken
-    $token = @{}
-    $token.Add("centreon-auth-token", "$authToken")
+  $authToken = ($auth | ConvertFrom-Json).authToken
+  $token = @{}
+  $token.Add("centreon-auth-token", "$authToken")
 
-    $Session = @{
+  $Session = @{
 
-        server  = $server
-        url     = "$url"
-        token   = $token
-    }
+    server = $server
+    url    = "$url"
+    token  = $token
+  }
 
-    return $Session
+  return $Session
 }

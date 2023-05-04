@@ -1,6 +1,6 @@
 function Invoke-CentreonCommand {
 
-     <#
+  <#
         .SYNOPSIS
             Interact with the Centreon Objects.
         .PARAMETER Session
@@ -26,37 +26,38 @@ function Invoke-CentreonCommand {
             https://github.com/ClissonFlorian/Centreon-Powershell-Module
     #>
     
-    param(
+  param(
         
-        [parameter(Mandatory = $true)]
-        [object]$Session,
+    [parameter(Mandatory = $true)]
+    [object]$Session,
 
-        [parameter(Mandatory = $true)]
-        [string]$object,
+    [parameter(Mandatory = $true)]
+    [string]$object,
 
-        [parameter(Mandatory = $true)]
-        [string]$action,
+    [parameter(Mandatory = $true)]
+    [string]$action,
 
-        [parameter(Mandatory = $false)]
-        [string]$values
-    )
+    [parameter(Mandatory = $false)]
+    [string]$values
+  )
     
         
-    if($values){
+  if ($values) {
         
-        $body = @{
-            "action" = "$action";
-            "object" = "$object";
-            "values" = "$values";
-        }
-    }else{
-        
-        $body = @{
-            "action" = "$action";
-            "object" = "$object";
-        }
+    $body = @{
+      "action" = "$action";
+      "object" = "$object";
+      "values" = "$values";
     }
+  }
+  else {
+        
+    $body = @{
+      "action" = "$action";
+      "object" = "$object";
+    }
+  }
     
-   $output = (Invoke-WebRequest -ContentType "application/json" -Uri "$($Session.url)action=action&object=centreon_clapi" -Method Post -Headers $($Session.token) -Body (ConvertTo-Json $body)).Content | ConvertFrom-Json
-   return $output.result
+  $output = (Invoke-WebRequest -ContentType "application/json" -Uri "$($Session.url)action=action&object=centreon_clapi" -Method Post -Headers $($Session.token) -Body (ConvertTo-Json $body) -SkipCertificateCheck).Content | ConvertFrom-Json
+  return $output.result
 }

@@ -63,78 +63,78 @@ function Get-CentreonHostStatus {
         https://github.com/ClissonFlorian/Centreon-Powershell-Module
 #>
 
-    param(
+  param(
            
-        [parameter(Mandatory = $true)]
-        [object]$Session,
+    [parameter(Mandatory = $true)]
+    [object]$Session,
 
-        [parameter(Mandatory = $false)]
-        [ValidateSet("all", "unhandled", "problems")][string]$viewType = "all",
+    [parameter(Mandatory = $false)]
+    [ValidateSet("all", "unhandled", "problems")][string]$viewType = "all",
 
-        [parameter(Mandatory = $false)]
-        [array]$fields,
+    [parameter(Mandatory = $false)]
+    [array]$fields,
         
-        [parameter(Mandatory = $false)]
-        [ValidateSet("up", "down", "unreachable", "pending", "all")][string]$status = "all",
+    [parameter(Mandatory = $false)]
+    [ValidateSet("up", "down", "unreachable", "pending", "all")][string]$status = "all",
 
-        [parameter(Mandatory = $false)]
-        [int]$hostgroup,
+    [parameter(Mandatory = $false)]
+    [int]$hostgroup,
 
-        [parameter(Mandatory = $false)]
-        [int]$instance,
+    [parameter(Mandatory = $false)]
+    [int]$instance,
 
-        [parameter(Mandatory = $false)]
-        [string]$search,
+    [parameter(Mandatory = $false)]
+    [string]$search,
 
-        [parameter(Mandatory = $false)]
-        [string]$criticality,
+    [parameter(Mandatory = $false)]
+    [string]$criticality,
 
-        [parameter(Mandatory = $false)]
-        [string]$sortType,
+    [parameter(Mandatory = $false)]
+    [string]$sortType,
 
-        [parameter(Mandatory = $false)]
-        [int]$limit,
+    [parameter(Mandatory = $false)]
+    [int]$limit,
 
-        [parameter(Mandatory = $false)]
-        [int]$number,
+    [parameter(Mandatory = $false)]
+    [int]$number,
 
-        [parameter(Mandatory = $false)]
-        [ValidateSet("ASC", "DESC")][string]$order = "ASC"
+    [parameter(Mandatory = $false)]
+    [ValidateSet("ASC", "DESC")][string]$order = "ASC"
         
-    )
+  )
 
-    $options = @()
+  $options = @()
     
-    #get function name and arguments
-    (Get-Command ($MyInvocation.MyCommand).Name).parameters.Keys | Where-Object {$_ -notmatch "token|url"} | ForEach-Object {
+  #get function name and arguments
+    (Get-Command ($MyInvocation.MyCommand).Name).parameters.Keys | Where-Object { $_ -notmatch "token|url" } | ForEach-Object {
 
-        $ValueFromVariable = Get-Variable $_ -ErrorAction SilentlyContinue   
-        $option = ($ValueFromVariable).Name
-        $value = ($ValueFromVariable).Value
+    $ValueFromVariable = Get-Variable $_ -ErrorAction SilentlyContinue   
+    $option = ($ValueFromVariable).Name
+    $value = ($ValueFromVariable).Value
        
-        if ($value) {
+    if ($value) {
         
-            $options += ("$option" + "=" + "$value")
-        }
-        
+      $options += ("$option" + "=" + "$value")
     }
+        
+  }
 
-    $cmdline = "object=centreon_realtime_hosts&action=list"
+  $cmdline = "object=centreon_realtime_hosts&action=list"
    
-    $options = $options -join "&"
+  $options = $options -join "&"
     
-    $query = "$cmdline&$options" 
+  $query = "$cmdline&$options" 
     
 
-    try {
+  try {
        
-        $output = (Invoke-WebRequest -ContentType "application/json" -Uri "$($Session.url)$query" -Method Get -Headers $($Session.token)).Content | ConvertFrom-Json
-        return $output
+    $output = (Invoke-WebRequest -ContentType "application/json" -Uri "$($Session.url)$query" -Method Get -Headers $($Session.token) -SkipCertificateCheck).Content | ConvertFrom-Json
+    return $output
     
-    }
-    catch {
+  }
+  catch {
        
-        Write-host $Error[0] -ForegroundColor Red
-    }
+    Write-host $Error[0] -ForegroundColor Red
+  }
 
 }
